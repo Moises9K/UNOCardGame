@@ -1,9 +1,6 @@
 package moises.Cartas;
 
-import moises.Base.Carta;
-import moises.Base.Colores;
-import moises.Base.SpecialCard;
-import moises.Base.Tipo;
+import moises.Base.*;
 
 public class UNOSpecialCard extends Carta {
     Colores color;
