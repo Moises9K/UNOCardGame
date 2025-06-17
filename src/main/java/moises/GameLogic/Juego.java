@@ -16,6 +16,10 @@ public class Juego {
     private boolean reverse = false;
 
 
+    public Player[] getJugadores() {
+        return jugadores;
+    }
+
 
     public Juego(int numJugadores) {
         inicializarJuego(numJugadores);
@@ -35,54 +39,85 @@ public class Juego {
         aleatorizarCartas();
     }
 
+    private boolean movimientoValido(Carta cartaAjugar,Carta cartaEnMesa ){
 
-    private boolean realizarJugada(int cartaAjugar){
+        if (cartaAjugar instanceof UNOWildCard){
+
+            return true;
+        }
+        if (cartaAjugar instanceof UNOCard unocardjugador){
+            if( cartaEnMesa instanceof UNOCard unocardactual){
+                return unocardjugador.getNumero() == unocardactual.getNumero() || unocardjugador.getColor() == unocardactual.getColor();
+            }
+            if(cartaEnMesa instanceof UNOSpecialCard unospecialactual){
+                return unocardjugador.getColor() == unospecialactual.getColor();
+            }
+            if (cartaEnMesa instanceof UNOWildCard unoWildCardactual){
+                return unocardjugador.getColor() == unoWildCardactual.getColor();
+            }
+        }
+        if (cartaAjugar instanceof UNOSpecialCard unocardjugador){
+            if( cartaEnMesa instanceof UNOCard unocardactual){
+                return unocardjugador.getColor() == unocardactual.getColor();
+            }
+            if(cartaEnMesa instanceof UNOSpecialCard unospecialactual){
+                return unocardjugador.getColor() == unospecialactual.getColor() || unocardjugador.getSpecialCard() == unospecialactual.getSpecialCard();
+            }
+            if (cartaEnMesa instanceof UNOWildCard unowildactual){
+                return unocardjugador.getColor() == unowildactual.getColor();
+            }
+        }
+
+        return false;
+    }
+
+
+    private boolean realizarJugada(int cartaAjugar, Colores colorElegido){
         Carta carta = jugadores[turnoactual].getCarta(cartaAjugar);
-        if (cartaactual instanceof UNOCard && carta instanceof UNOCard){
-            if(((UNOCard) cartaactual).getColor() == ((UNOCard) carta).getColor()){
-                cartaactual = carta;
-                jugadores[turnoactual].eliminarCarta(cartaAjugar);
-                pasarTurno();
+        if (!movimientoValido(carta,cartaactual)){
+            System.out.println("No se pudo realizar la jugada");
+            return false;
+        }
 
-                return true;
+        if (carta instanceof UNOCard){
+            pasarCarta(carta,cartaAjugar);
+            pasarTurno();
+        }
+        if (carta instanceof UNOSpecialCard cartajugadorspecial){
+            switch (cartajugadorspecial.getSpecialCard()){
+                case Draw_Two:
+                    drawTwoGivePlayer(aleatorizarCarta(),aleatorizarCarta());
+                    pasarCarta(carta,cartaAjugar);
+                    break;
+                case Reverse:
+                    reverseFunction();
+                    pasarCarta(carta,cartaAjugar);
+                    break;
+                case Skip:
+                    skipFunction();
+                    pasarCarta(carta,cartaAjugar);
+                    break;
             }
-            else if(((UNOCard) cartaactual).getNumero() == ((UNOCard) carta).getNumero()){
-                cartaactual = carta;
-                return true;
-            }
-            else{
-                System.out.println("No se cumplen los requisitos para realizar una jugada");
+        }
+        if (carta instanceof UNOWildCard cartajugadorwild){
+
+            if (colorElegido == null){
+                System.out.println("Color no seleccionado");
                 return false;
             }
-        }
-        else if(cartaactual instanceof UNOSpecialCard && carta instanceof UNOSpecialCard){
-            if(((UNOSpecialCard) cartaactual).getColor() == ((UNOSpecialCard) carta).getColor()){
-                if(((UNOSpecialCard) carta).getSpecialCard() == SpecialCard.Draw_Two){
-                    Carta cartauno = aleatorizarCarta();
-                    Carta cartados = aleatorizarCarta();
-                    drawTwoGivePlayer(cartauno, cartados);
-                    cartaactual = carta;
-                }
-                else if(((UNOSpecialCard) carta).getSpecialCard() == SpecialCard.Skip){
-                    cartaactual = carta;
-                    skipFunction();
-
-                }
-                else if(((UNOSpecialCard) carta).getSpecialCard() == SpecialCard.Reverse){
-                    cartaactual = carta;
-                    reverseFunction();
-                }
+            cartajugadorwild.setColor(colorElegido);
+            if (cartajugadorwild.getWildCard() == WildCard.Wild){
+                pasarCarta(carta,cartaAjugar);
             }
-        }
-        else if(carta instanceof UNOWildCard){
-            if (((UNOWildCard) carta).getWildCard() == WildCard.Wild){
-                cartaactual = carta;
 
-
+            if(cartajugadorwild.getWildCard() == WildCard.Wild_Draw_Four){
+                drawFourGivePlayer(aleatorizarCarta(),aleatorizarCarta(),aleatorizarCarta(),aleatorizarCarta());
+                pasarCarta(carta,cartaAjugar);
             }
         }
 
-
+        System.out.println("Jugada realizada con exito");
+        return true;
     }
 
     private void aleatorizarCartas(){
@@ -136,48 +171,61 @@ public class Juego {
     }
 
     private void drawTwoGivePlayer(Carta cartaUno, Carta cartaDos){
-        if(turnoactual == turnomax){
-            turnoactual = 0;
-            jugadores[turnoactual].agregarCarta(cartaUno);
-            jugadores[turnoactual].agregarCarta(cartaDos);
-            System.out.println("Agregado cartas a jugador: " + turnoactual);
-        }
-        else{
-            jugadores[turnoactual].agregarCarta(cartaUno);
-            jugadores[turnoactual].agregarCarta(cartaDos);
-            System.out.println("Agregado cartas a jugador: " + turnoactual);
+        jugadores[turnoactual].agregarCarta(cartaUno);
+        jugadores[turnoactual].agregarCarta(cartaDos);
+        System.out.println("Agregando carta para jugador: " + turnoactual);
+        pasarTurno();
+    }
+    private void drawFourGivePlayer(Carta cartaUno, Carta cartaDos,Carta cartaTres, Carta cartaCuatro){
+        jugadores[turnoactual].agregarCarta(cartaUno);
+        jugadores[turnoactual].agregarCarta(cartaDos);
+        jugadores[turnoactual].agregarCarta(cartaTres);
+        jugadores[turnoactual].agregarCarta(cartaCuatro);
+        System.out.println("Agregado cartas a jugador: " + turnoactual);
+        pasarTurno();
 
-        }
     }
 
     private void pasarTurno(){
         if (!reverse){
-            turnoactual++;
+            if(turnoactual == turnomax){
+                turnoactual = 0;
+            }
+            else{
+                turnoactual++;
+            }
         }
         else if(reverse){
-            turnoactual--;
+            if(turnoactual == 0){
+                turnoactual = turnomax;
+
+            }
+            else{
+                turnoactual--;
+            }
         }
     }
 
-    private void skipFunction(){
-        if (turnoactual == turnomax) {
-            turnoactual = 1;
-            System.out.println("Skipeado");
-        }
+    private void pasarCarta(Carta carta, int cartapos){
+        cartaactual = carta;
+        jugadores[turnoactual].eliminarCarta(cartapos);
+    }
 
-        else{
-            turnoactual++;
-            turnoactual++;
-            System.out.println("Skipeado");
-        }
+
+    private void skipFunction(){
+        pasarTurno();
+        pasarTurno();
+
     }
 
     private void reverseFunction(){
         if(!reverse){
             reverse = true;
+            pasarTurno();
         }
         else if(reverse){
             reverse = false;
+            pasarTurno();
         }
     }
 
