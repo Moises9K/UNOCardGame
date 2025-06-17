@@ -9,7 +9,7 @@ public class Main {
         //Objetivo del juego: Ser el primer jugador en remover todas las cartas que le tocaron
         //Se reparten 7 cartas a cada uno
         //Cuando se tiene una carta en la mano, gritar UNO
-        Juego juego = new Juego(2);
+        Juego juego = new Juego(3);
 
     }
 }
