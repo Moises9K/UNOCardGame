@@ -1,8 +1,17 @@
 package moises.Base;
 
+import moises.GameLogic.Juego;
+
 public abstract class Carta {
-    private String name;
-    private Tipo tipo;
+    private final String name;
+    private final Tipo tipo;
+    Colores color;
+
+    public Carta(String name, Tipo tipo, Colores color) {
+        this.name = name;
+        this.tipo = tipo;
+        this.color = color;
+    }
 
     public Carta(String name, Tipo tipo) {
         this.name = name;
@@ -17,13 +26,19 @@ public abstract class Carta {
         return tipo;
     }
 
-    public void setName(String name) {
-        this.name = name;
+
+    public Colores getColor() {
+        return color;
     }
 
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
+    public void setColor(Colores color) {
+        this.color = color;
     }
+
+    public abstract boolean jugadaValida(Carta cartaEnMesa);
+
+    public abstract void realizarEfecto(Juego juego);
+
 
     @Override
     public String toString() {

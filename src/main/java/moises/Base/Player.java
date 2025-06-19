@@ -1,11 +1,12 @@
 package moises.Base;
 
 import java.util.Arrays;
+import java.util.List;
 
-public class Player {
+public abstract class Player {
 
     private String name;
-    private Carta[] cartas;
+    private List<Carta> cartas;
 
     public Player(String name) {
         this.name = name;
@@ -19,33 +20,25 @@ public class Player {
         this.name = name;
     }
 
-    public Carta[] getCartas() {
+    public Carta obtenerCarta(int i){
+        return cartas.get(i);
+    }
+
+    public void añadirCarta(Carta carta){
+        cartas.add(carta);
+    }
+    public void eliminarCarta(Carta carta){
+        cartas.remove(carta);
+    }
+
+    public List<Carta> getCartas() {
         return cartas;
     }
 
-    public Carta getCarta(int pos) {
-        return cartas[pos];
-    }
-    public void eliminarCarta(int pos) {
-        cartas[pos] = null;
-    }
-    public void agregarCarta(Carta carta) {
-        for(int i = 0; i < cartas.length; i++){
-            if(cartas[i] == null){
-                cartas[i] = carta;
-            }
-        }
-    }
-
-    public void setCartas(Carta[] cartas) {
+    public void setCartas(List<Carta> cartas) {
         this.cartas = cartas;
     }
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "name='" + name + '\'' +
-                ", cartas=" + Arrays.toString(cartas) +
-                '}';
-    }
+    public abstract int jugarCarta();
+
 }
