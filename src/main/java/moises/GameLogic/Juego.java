@@ -23,6 +23,7 @@ public class Juego {
         this.baraja = baraja;
         this.jugadores = jugadores;
         inicializarJuego();
+        cartaactual.setColor(Colores.Green);
     }
 
     private void inicializarJuego(){
@@ -34,24 +35,21 @@ public class Juego {
 
     private boolean movimientoValido(Carta cartaAjugar,Carta cartaEnMesa){
         return cartaAjugar.jugadaValida(cartaEnMesa);
+
     }
 
-    public boolean realizarJugada(Colores colorElegido){
+    public boolean realizarJugada(){
         System.out.println("Carta actual: " + cartaactual.getName());
 
         int choice = jugadores[turnoactual].jugarCarta();
+        if(choice == jugadores[turnoactual].getCartas().size()){
+            Carta cartaaleatoria = baraja.aleatorizarCarta();
+            jugadores[turnoactual].añadirCarta(cartaaleatoria);
+            return true;
+
+        }
         Carta cartaelegida = jugadores[turnoactual].obtenerCarta(choice);
 
-        if(cartaelegida instanceof UNOWildCard unoWildCard){
-            if(unoWildCard.getWildCard() == WildCard.Wild){
-                if(colorElegido == null){
-                    System.out.println("Eliga un Color");
-                    return false;
-                }
-                unoWildCard.setColor(colorElegido);
-                return true;
-            }
-        }
         if (movimientoValido(cartaelegida,cartaactual)){
             pasarCarta(cartaelegida);
             cartaelegida.realizarEfecto(this);
@@ -64,7 +62,6 @@ public class Juego {
         }
 
     }
-
 
     public void drawCardsPlayer(Carta[] cartas){
         for (Carta carta : cartas) {
@@ -102,18 +99,15 @@ public class Juego {
 
     public void skipFunction(){
         pasarTurno();
-        pasarTurno();
 
     }
 
     public void reverseFunction(){
         if(!reverse){
             reverse = true;
-            pasarTurno();
         }
         else if(reverse){
             reverse = false;
-            pasarTurno();
         }
     }
 }
