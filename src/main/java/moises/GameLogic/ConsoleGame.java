@@ -11,7 +11,7 @@ public class ConsoleGame {
     public void iniciarJuego(){
         while(true){
 
-            juego.realizarJugada(null);
+            juego.realizarJugada();
         }
     }
 
