@@ -40,5 +40,6 @@ public abstract class Player {
     }
 
     public abstract int jugarCarta();
+    public abstract void darColorCartaWild(Carta carta);
 
 }
